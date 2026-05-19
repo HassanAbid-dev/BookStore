@@ -1,6 +1,8 @@
 {
   "type": "module",
   "dependencies": {
+    "autocannon": "^8.0.0",
+    "axios": "^1.16.1",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",

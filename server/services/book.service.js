@@ -108,15 +108,35 @@ export const deleteBook = async ({ id }) => {
 };
 
 export const getAllBooks = async () => {
+  const cached = await redis.get("all-books");
+  if (cached) {
+    console.log("Cache hit");
+    return JSON.parse(cached);
+  }
+  console.log("Cache miss");
   const books = await Book.find();
+  await redis.set("all-books", JSON.stringify(books), "EX", 3600); // Cache for 1 hour
   return books;
 };
 export const getBookById = async ({ id }) => {
-  const book = await Book.findOne({
-    _id: id,
-  });
-  if (!book) {
-    throw new Error("Book not found");
+  const cachedBooks = await redis.get("all-books");
+  if (cachedBooks) {
+    const books = JSON.parse(cachedBooks);
+    const book = books.find((b) => b._id.toString() === id);
+    if (book) {
+      console.log("Cache hit for book id:", id);
+      return book;
+    }
   }
+
+  // cache miss or book not in cache — query DB
+  console.log("Cache miss for book id:", id);
+  const book = await Book.findById(id);
+  if (!book) throw new Error("Book not found");
+
+  // refresh cache with latest data
+  const allBooks = await Book.find();
+  await redis.set("all-books", JSON.stringify(allBooks), "EX", 3600);
+
   return book;
 };
