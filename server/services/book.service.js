@@ -1,10 +1,7 @@
 import Book from "../models/bookModel.js";
 import { z } from "zod";
-import Redis from "ioredis";
-const redis = new Redis({
-  host: "localhost",
-  port: 6379,
-});
+import redis from "../config/redis.js";
+
 // Validation schema for creating/updating a book
 const bookSchema = z.object({
   title: z
@@ -52,6 +49,7 @@ export const createBook = async ({
     isbn,
     publishedDate: new Date(result.data.publishedDate),
   });
+  await redis.del("all-books"); // Invalidate cache
   return {
     message: "Book created successfully",
     book,
@@ -87,6 +85,7 @@ export const updateBook = async ({
   book.price = result.data.price;
   book.publishedDate = new Date(result.data.publishedDate);
   await book.save();
+  await redis.del("all-books"); // Invalidate cache
   return {
     message: "Book updated successfully",
 
@@ -102,6 +101,7 @@ export const deleteBook = async ({ id }) => {
     throw new Error("Book not found");
   }
   await book.deleteOne();
+  await redis.del("all-books"); // Invalidate cache
   return {
     message: "Book deleted successfully",
   };

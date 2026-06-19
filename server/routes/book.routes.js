@@ -7,10 +7,8 @@ import {
 } from "../controllers/bookcontroller.js";
 import Router from "express";
 import authMiddleware from "../middlewares/authmiddleware.js";
-import Redis from "ioredis";
+import redis from "../config/redis.js";
 const bookRouter = Router();
-
-const redis = new Redis({ host: "localhost", port: 6379 });
 
 bookRouter.delete("/flush-cache", async (req, res) => {
   await redis.del("all-books");
