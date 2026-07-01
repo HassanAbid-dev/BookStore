@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   app:
@@ -9,7 +9,7 @@ services:
       - PORT=3000
       - MONGODB_URL=mongodb://mongodb:27017/bookstore
       - REDIS_URL=redis://redis:6379
-      - ACCESS_SECRET=yioebfxoeruigfneriugfxeriruoeuirgfxnerygfb9eryfxge9rfgoziweufxnoerugoiwuegfbxeriugferg
+      - ACCESS_SECRET=${ACCESS_SECRET}
     depends_on:
       - mongodb
       - redis
